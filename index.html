@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>GifTastic Themes</title>
+  <style type="text/css">
+    button,
+    div,
+    form,
+    input {
+      margin: 10px;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <div class="container">
+    <h1>Gif Search</h1>
+
+
+    <!-- Rendered Buttons will get Dumped Here  -->
+    <div id="buttons-view"></div>
+
+    <form id="topic-form">
+      <label for="topic-input">Add a Topic</label>
+      <input type="text" id="topic-input">
+      <br>
+
+      <!-- Button triggers new movie to be added -->
+      <input id="add-topic" type="submit" value="Add a Topic">
+    </form>
+
+    <!-- Topics will Get Dumped Here -->
+    <div id="topics-view"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+      // Initial array of topics
+      var topics = ["Funny Cats", "Funny Dogs", "Cute Babies", "Cute Squirrels", "Frogs"];
+
+      // displayTopicInfo function re-renders the HTML to display the appropriate content
+      function displayTopicInfo() {
+        console.log("displayTopicInfo function");
+
+        var topic = $(this).attr("data-name");
+
+        var topic_nospace = topic.replace(" ", "+");
+        console.log(topic_nospace);
+
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic_nospace + "&limit=10&apikey=TVvibrWSbbOWxPHJA2jn9vr3FTG4ltmv";
+        console.log("queryURL: " + queryURL);
+
+        // Creating an AJAX call for the specific topic button being clicked
+        $.ajax({
+          url: queryURL,
+          method: "GET"
+        }).then(function (response) {
+          console.log(response);
+
+          // Creating a div to hold the topic
+          var topicDiv = $("<div class='topic'>");
+
+          var numberToDisplay = 0;
+
+          // Determine the number of images to display. If number retrieved is < 10, use that number, 
+          // otherwise limit to 10 images.
+
+          if (response.data.length < 10) {
+            numberToDisplay = response.data.length
+          }
+          else {
+            numberToDisplay = 10;
+          }
+
+          for (var i = 0; i < numberToDisplay; i++) {
+
+            // Retrieving the URL for the image
+            var imgURL = response.data[i].images.downsized.url;
+            console.log(imgURL);
+
+            // Creating an element to hold the image
+            var image = $("<img>").attr("src", imgURL);
+
+            // Appending the image
+            topicDiv.append(image);
+          }
+          // Putting the entire topic above the previous topic
+          $("#topics-view").prepend(topicDiv);
+
+        });
+
+      }
+
+
+      // Function for displaying topic data
+      function renderButtons() {
+        console.log("In renderButtons function");
+
+        // Deleting the topics prior to adding new topics
+        // (this is necessary otherwise you will have repeat buttons)
+        $("#buttons-view").empty();
+
+        // Looping through the array of topics
+        for (var i = 0; i < topics.length; i++) {
+
+          // Then dynamicaly generating buttons for each movie in the array
+          // This code $("<button>") is all jQuery needs to create the beginning and end tag. (<button></button>)
+          var a = $("<button>");
+          // Adding a class of movie-btn to our button
+          a.addClass("topic-btn");
+          // Adding a data-attribute
+          a.attr("data-name", topics[i]);
+          // Providing the initial button text
+          a.text(topics[i]);
+          console.log("topics button" + a);
+          // Adding the button to the buttons-view div
+          $("#buttons-view").append(a);
+          console.log("button added");
+        }
+      }
+
+      // This function handles events where a topic button is clicked
+      $("#add-topic").on("click", function (event) {
+        console.log("in add-topic click");
+        //Since #add-topic is inside of a form, override the form property of "submit"
+        event.preventDefault();
+        // This line grabs the input from the textbox
+        var topic = $("#topic-input").val().trim();
+
+        // Adding movie from the textbox to our array
+        topics.push(topic);
+
+        // Calling renderButtons which handles the processing of our movie array
+        renderButtons();
+      });
+
+      // Adding a click event listener to all elements with a class of "topic-btn"
+      $(document).on("click", ".topic-btn", displayTopicInfo);
+
+      // Calling the renderButtons function to display the intial buttons
+      renderButtons();
+
+    </script>
+  </div>
+</body>
+
+</html>
