@@ -16,6 +16,12 @@
       max-width: 100%;
       height: auto;
     }
+    p {
+      font-size: 20px;
+    }
+    span {
+      font-size: 40px;
+    }
   </style>
 
 </head>
@@ -39,12 +45,16 @@
     </form>
 
     <!-- Topics will Get Dumped Here -->
-    <div id="topics-view"></div>
+    <div id="topics-view">
+      <img src="" data-animate="" data-still="" data-state="" class="gif">
+      <p class="rating">Rating:</p> 
+
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type="text/javascript">
       // Initial array of topics
-      var topics = ["Funny Cats", "Funny Dogs", "Cute Babies", "Cute Squirrels", "Frogs"];
+      var topics = ["Funny Cats", "Funny Dogs", "Cute Babies", "Cute Squirrels", "Cute Birds", "Cute Pandas", "Cute Ducks", "Cute Horses"];
 
       // displayTopicInfo function re-renders the HTML to display the appropriate content
       function displayTopicInfo() {
@@ -54,8 +64,8 @@
 
         var topic_nospace = topic.replace(" ", "+");
         console.log(topic_nospace);
-
-        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic_nospace + "&limit=10&apikey=TVvibrWSbbOWxPHJA2jn9vr3FTG4ltmv";
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic_nospace + "&limit=10&rating=g&apikey=TVvibrWSbbOWxPHJA2jn9vr3FTG4ltmv";
+        // var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic_nospace + "&limit=10&rating="g"&apikey=TVvibrWSbbOWxPHJA2jn9vr3FTG4ltmv";
         console.log("queryURL: " + queryURL);
 
         // Creating an AJAX call for the specific topic button being clicked
@@ -83,14 +93,35 @@
           for (var i = 0; i < numberToDisplay; i++) {
 
             // Retrieving the URL for the image
-            var imgURL = response.data[i].images.downsized.url;
-            console.log(imgURL);
+            var imgURL = response.data[i].images.fixed_width_still.url;
+            var imgURLAnimate = response.data[i].images.fixed_width.url;
+
+            var rating = response.data[i].rating;
+
+            console.log("imgURL " + imgURL);
+            console.log("rating " + rating);
+            console.log("imgURLAnimate " + imgURLAnimate);
 
             // Creating an element to hold the image
-            var image = $("<img>").attr("src", imgURL);
+            // var image = $("<img>").attr("src", imgURL);
+
+            var image = $("<img>");
+            image.attr("src", imgURL);
+            var animate;
+
+            image.attr("data-animate", imgURLAnimate);
+            image.attr("data-still", imgURL);
+            image.attr("data-state", "still");
+            image.addClass("gif");
+            console.log("class gif added to image");
+
+
+            // $(image).attr("data-animate", imgURLAnimate);
+            console.log("image " + image);
 
             // Appending the image
             topicDiv.append(image);
+            topicDiv.append($("<span>").text(rating));
           }
           // Putting the entire topic above the previous topic
           $("#topics-view").prepend(topicDiv);
@@ -135,7 +166,7 @@
         // This line grabs the input from the textbox
         var topic = $("#topic-input").val().trim();
 
-        // Adding movie from the textbox to our array
+        // Adding topic from the textbox to our array
         topics.push(topic);
 
         // Calling renderButtons which handles the processing of our movie array
@@ -144,6 +175,30 @@
 
       // Adding a click event listener to all elements with a class of "topic-btn"
       $(document).on("click", ".topic-btn", displayTopicInfo);
+
+      //Click event listener for .gif - when image is clicked, if still, change to animate
+
+      $(document).on("click", ".gif", function () {
+
+        console.log("in .gif click");
+        var state = $(this).attr("data-state");
+        // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+        console.log(this);
+        // If the clicked image's state is still, update its src attribute to what its data-animate value is.
+        // Then, set the image's data-state to animate
+        // Else set src to the data-still value
+        if (state === "still") {
+          console.log("state is still" + $(this));
+          $(this).attr("src", $(this).attr("data-animate"));
+          $(this).attr("data-state", "animate");
+        } else {
+          console.log("state is not still")
+          $(this).attr("src", $(this).attr("data-still"));
+          $(this).attr("data-state", "still");
+
+        }
+        console.log($(this));
+      });
 
       // Calling the renderButtons function to display the intial buttons
       renderButtons();
