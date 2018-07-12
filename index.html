@@ -16,11 +16,13 @@
       max-width: 100%;
       height: auto;
     }
+
     p {
       font-size: 20px;
     }
+
     span {
-      font-size: 40px;
+      font-size: 20px;
     }
   </style>
 
@@ -47,7 +49,7 @@
     <!-- Topics will Get Dumped Here -->
     <div id="topics-view">
       <img src="" data-animate="" data-still="" data-state="" class="gif">
-      <p class="rating">Rating:</p> 
+      <p class="rating"></p>
 
     </div>
 
@@ -64,8 +66,7 @@
 
         var topic_nospace = topic.replace(" ", "+");
         console.log(topic_nospace);
-        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic_nospace + "&limit=10&rating=g&apikey=TVvibrWSbbOWxPHJA2jn9vr3FTG4ltmv";
-        // var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic_nospace + "&limit=10&rating="g"&apikey=TVvibrWSbbOWxPHJA2jn9vr3FTG4ltmv";
+        var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + topic_nospace + "&limit=10&rating=pg&apikey=TVvibrWSbbOWxPHJA2jn9vr3FTG4ltmv";
         console.log("queryURL: " + queryURL);
 
         // Creating an AJAX call for the specific topic button being clicked
